@@ -213,7 +213,7 @@ func CalculateMatchStay(currentPrice sdk.Dec, orderBook OrderBook) (r BatchResul
 		r.MatchType = FractionalMatch
 		if r.EX.GT(r.SwapPrice.Mul(r.EY)) {
 			r.EX = r.SwapPrice.Mul(r.EY)
-		} else if r.EX.GT(r.SwapPrice.Mul(r.EY)) {
+		} else if r.EX.GT(r.SwapPrice.Mul(r.EY)) { // hyung : GT -> LT ?
 			r.EY = r.EX.Quo(r.SwapPrice)
 		}
 	}
@@ -367,7 +367,7 @@ func CalculateSwap(direction int, X, Y, orderPrice, lastOrderPrice sdk.Dec, orde
 	r.EY = r.OriginalEY.ToDec()
 
 	//r.SwapPrice = X.Add(r.EX).Quo(Y.Add(r.EY)) // legacy constant product model
-	r.SwapPrice = X.Add(r.EX.MulInt64(2)).Quo(Y.Add(r.EY.MulInt64(2))) // newSwapPriceModel
+	r.SwapPrice = X.Add(r.EX.MulInt64(2)).Quo(Y.Add(r.EY.MulInt64(2))) // newSwapPriceModel // hyung : why not decimal for 2? no problem?
 
 	if direction == Increase {
 		//r.PoolY = Y.Sub(X.Quo(r.SwapPrice))  // legacy constant product model
@@ -392,7 +392,7 @@ func CalculateSwap(direction int, X, Y, orderPrice, lastOrderPrice sdk.Dec, orde
 	}
 
 	if r.MatchType == 0 {
-		r.OriginalEX, r.OriginalEY = GetExecutableAmt(lastOrderPrice.Add(orderPrice).Quo(sdk.NewDec(2)), orderBook)
+		r.OriginalEX, r.OriginalEY = GetExecutableAmt(lastOrderPrice.Add(orderPrice).Quo(sdk.NewDec(2)), orderBook) // hyung : fractionalMatch : getExecutableAmt(orderPrice, orderBook)
 		r.EX = r.OriginalEX.ToDec()
 		r.EY = r.OriginalEY.ToDec()
 		r.SwapPrice = orderPrice
@@ -412,7 +412,7 @@ func CalculateSwap(direction int, X, Y, orderPrice, lastOrderPrice sdk.Dec, orde
 
 	if direction == Increase {
 		//r.PoolY = Y.Sub(X.Quo(r.SwapPrice))
-		r.PoolY = r.SwapPrice.Mul(Y).Sub(X).Quo(r.SwapPrice.MulInt64(2))  // newSwapPriceModel
+		r.PoolY = r.SwapPrice.Mul(Y).Sub(X).Quo(r.SwapPrice.MulInt64(2))  // newSwapPriceModel /// redundant
 		if r.SwapPrice.LT(X.Quo(Y)) || r.PoolY.IsNegative() {
 			r.TransactAmt = sdk.ZeroDec()
 		} else {
@@ -582,7 +582,7 @@ func (k Keeper) SwapExecution(ctx sdk.Context, liquidityPoolBatch types.Liquidit
 }
 
 func GetPriceDirection(currentPrice sdk.Dec, orderBook OrderBook) int {
-	buyAmtOverCurrentPrice := sdk.ZeroInt()
+	buyAmtOverCurrentPrice := sdk.ZeroInt() // hyung : int? not decimal?
 	buyAmtAtCurrentPrice := sdk.ZeroInt()
 	sellAmtUnderCurrentPrice := sdk.ZeroInt()
 	sellAmtAtCurrentPrice := sdk.ZeroInt()
