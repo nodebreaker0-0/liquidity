@@ -50,7 +50,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithHomeDir(liquidity.DefaultNodeHome)
 
 	rootCmd := &cobra.Command{
-		Use:   "liquidityd",
+		Use:   "liqd",
 		Short: "Stargate CosmosHub App",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
@@ -97,7 +97,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		debug.Cmd(),
 	)
 
-	server.AddCommands(rootCmd, liquidity.DefaultNodeHome, newApp, createSimappAndExport)
+	server.AddCommands(rootCmd, liquidity.DefaultNodeHome, newApp, createLiqAppAndExport)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -187,7 +187,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		panic(err)
 	}
 
-	return liquidity.NewSimApp(
+	return liquidity.NewLiqApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
@@ -207,21 +207,21 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 	)
 }
 
-func createSimappAndExport(
+func createLiqAppAndExport(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailWhiteList []string,
 ) (servertypes.ExportedApp, error) {
 
 	encCfg := liquidity.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
-	var app *liquidity.SimApp
+	var app *liquidity.LiqApp
 	if height != -1 {
-		app = liquidity.NewSimApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg)
+		app = liquidity.NewLiqApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg)
 
 		if err := app.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		app = liquidity.NewSimApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg)
+		app = liquidity.NewLiqApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg)
 	}
 
 	return app.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)

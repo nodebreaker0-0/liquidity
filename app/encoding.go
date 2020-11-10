@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/cosmos/cosmos-sdk/std"
+	"github.com/nodebreaker0-0/liquidity/app/params"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for testing
