@@ -1,9 +1,8 @@
 go 1.15
 
-module github.com/tendermint/liquidity
+module github.com/nodebreaker0-0/liquidity
 
 require (
-	github.com/c-osmosis/osmosis v0.0.0-20201029222406-7527331528e2
 	github.com/cosmos/cosmos-sdk v0.40.0-rc0
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
@@ -12,6 +11,7 @@ require (
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.6.1
+	github.com/tendermint/liquidity v0.0.0-20201109100623-012a59733167
 	github.com/tendermint/tendermint v0.34.0-rc4.0.20201005135527-d7d0ffea13c6
 	github.com/tendermint/tm-db v0.6.2
 	google.golang.org/genproto v0.0.0-20201019141844-1ed22bb0c154

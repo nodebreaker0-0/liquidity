@@ -187,7 +187,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		panic(err)
 	}
 
-	return liquidity.NewliquidityApp(
+	return liquidity.NewSimApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
@@ -213,15 +213,15 @@ func createSimappAndExport(
 
 	encCfg := liquidity.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
-	var app *liquidity.liquidityApp
+	var app *liquidity.SimApp
 	if height != -1 {
-		app = liquidity.NewliquidityApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg)
+		app = liquidity.NewSimApp(logger, db, traceStore, false, map[int64]bool{}, "", uint(1), encCfg)
 
 		if err := app.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	} else {
-		app = liquidity.NewliquidityApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg)
+		app = liquidity.NewSimApp(logger, db, traceStore, true, map[int64]bool{}, "", uint(1), encCfg)
 	}
 
 	return app.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
